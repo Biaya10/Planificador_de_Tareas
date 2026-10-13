@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificador de Tareas</title>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Mi Planificador de Tareas</h1>
+    </header>
+
+    <!-- Contenido principal de la aplicación -->
+    <main>
+        <section id="task-form-section">
+            <h2>Agregar nueva tarea</h2>
+            <!-- Formulario básico para capturar tareas -->
+            <form id="task-form">
+                <input type="text" id="task-input" placeholder="Escribe una nueva tarea..." required>
+                <button type="submit">Añadir</button>
+            </form>
+        </section>
+
+        <!-- Sección visual del tablero o lista -->
+        <section id="task-board">
+            <div class="column" id="todo-column">
+                <h3>Por hacer</h3>
+                <ul id="todo-list"></ul>
+            </div>
+            <div class="column" id="inprogress-column">
+                <h3>En proceso</h3>
+                <ul id="inprogress-list"></ul>
+            </div>
+            <div class="column" id="done-column">
+                <h3>Completadas</h3>
+                <ul id="done-list"></ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>&copy; 2026 Planificador de Tareas</p>
+    </footer>
+
+</body>
+</html>
