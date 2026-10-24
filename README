@@ -1,0 +1,94 @@
+# Planificador de Tareas
+
+Aplicación web hecha con HTML, Bootstrap 5.3 y JavaScript. Permite agregar tareas mediante un formulario validado, verlas como tarjetas y eliminarlas. Las tareas se guardan solo en memoria (no hay `localStorage` todavía).
+
+## Estructura
+
+```
+Planificador_de_Tareas/
+├── index.html      # Formulario y contenedor de tareas
+├── css/style.css   # Estilos propios
+└── js/app.js       # Clases Task y TaskManager, validación y eventos
+```
+
+## Cómo probarlo
+1. Abrir `index.html` en el navegador.
+2. Verificar que aparecen 5 tareas de ejemplo.
+3. Enviar el formulario vacío: deben aparecer los mensajes de error.
+4. Completar bien los datos y presionar **Añadir tarea**: la tarjeta nueva aparece.
+5. Presionar **Eliminar** en una tarjeta: desaparece de la pantalla y del arreglo.
+
+## Qué hace
+- **Validación** (`validateTaskForm`): nombre y "Asignado a" con más de 8 caracteres, descripción con más de 15, fecha obligatoria y estado seleccionado. Se usa `trim()` para ignorar espacios.
+- **Clase `TaskManager`**: `getAllTasks`, `getTasksWithStatus`, `addTask`, `deleteTask`, `updateTask` y `assignTask`. Un contador (`currentId`) genera IDs únicos.
+- **Tarjetas**: muestran nombre, descripción, asignado a, fecha de entrega y estado.
+- **Estados**: POR HACER, EN PROCESO, REVISIÓN y HECHO (los de la guía del Sprint 2).
+
+## Decisiones de diseño y resolución de problemas
+
+**Restricciones del sprint:** las tareas viven solo en memoria; se evalúa la funcionalidad y no el diseño; hay reglas de validación fijas (más de 8 caracteres en nombre y asignado, más de 15 en descripción); y se exige JS en un archivo aparte, una clase `TaskManager` y un botón de eliminar.
+
+### 1. ¿Dónde validar el formulario?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| Atributos HTML5 (`required`, `minlength`) | Muy poco código; lo hace el navegador | Mensajes genéricos que cambian según el navegador; `minlength` no hace `trim()`, así que acepta nombres de solo espacios; no permite "más de 8" de forma exacta |
+| Validar con JavaScript (`validateTaskForm`) | Mensajes propios que dicen qué campo falla y por qué; permite `trim()` y reglas exactas | Más código |
+
+**Decisión: JavaScript**, con `novalidate` en el formulario. La guía exige una función `validateTaskForm` que devuelva `true` o `false` y mensajes "significativos", cosa que HTML5 no permite.
+
+### 2. ¿Cómo mostrar los errores?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| `alert()` | Es más simple | Interrumpe al usuario y bloquea la página; se pierde el mensaje al cerrarlo |
+| Mensaje debajo de cada campo | Muy claro dónde está el error | Más HTML y más código para crear y limpiar cada mensaje |
+| Un solo recuadro con todos los errores | Se ven todos juntos sin interrumpir; poco código | El usuario debe buscar el campo a mano |
+
+**Decisión: un recuadro único** (`alert alert-danger`, `showErrors` y `clearErrors`). Muestra todos los errores a la vez, usa Bootstrap y es sencillo de mantener.
+
+### 3. ¿Cómo construir las tarjetas?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| Plantilla con `innerHTML` | Se lee más corto | Si el usuario escribe HTML en un campo, se ejecuta (riesgo de inyección) |
+| `createElement` con `textContent` | Es seguro; cada elemento queda accesible para añadirle eventos | Más líneas |
+
+**Decisión: `createElement` y `textContent`.** Es más seguro, y además el botón "Eliminar" se conecta directo al elemento.
+
+### 4. ¿Cómo organizar el código?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| Funciones y un array global | Rápido de escribir | Datos y operaciones quedan sueltos; la guía pide `TaskManager` |
+| Clases `Task` y `TaskManager` | Agrupa datos y operaciones; el ID se genera dentro de la clase | Algo más de estructura |
+
+**Decisión: clases.** Cumple la guía, y el contador `currentId` garantiza IDs únicos.
+
+### 5. ¿Cómo generar el ID único?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| `Date.now()` | No necesita estado | Puede repetirse si se agregan dos tareas muy seguidas |
+| Contador en `TaskManager` | Siempre único y creciente | Se reinicia al recargar (aceptable: aún no hay persistencia) |
+
+**Decisión: contador.** Es único, creciente y encaja con la restricción de "solo en memoria".
+
+### 6. ¿Cómo eliminar una tarea?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| `splice()` | Modifica el array original | Hay que buscar el índice y se puede equivocar |
+| `filter()` | Una línea, sin buscar índice, deja el array nuevo sin la tarea | Crea un array nuevo |
+
+**Decisión: `filter()` por ID**, y luego `col.remove()` para quitar la tarjeta del DOM.
+
+### Cómo lo implementé
+Implementé las decisiones anteriores en `js/app.js` y `index.html`. Probé el flujo completo en el navegador: formulario vacío, datos válidos y eliminación de tarjetas.
+
+## Cobertura de la rúbrica
+
+| Criterio | Cumplimiento |
+|---|---|
+| Formulario con Bootstrap | Todos los campos con su `label`, y `select` de estado con las 4 opciones. |
+| Tarjeta y lista de tareas | La tarjeta muestra los 5 datos, la cuadrícula las organiza y hay 5 ejemplos. |
+| Validación del formulario | Se validan los 5 campos, con mensajes claros y JS en archivo separado. |
+| Resolución de problemas | Ver la sección "Decisiones de diseño" de este README. |
+
+## Pendiente para otros sprints(según doc- Sprint2)
+- Persistencia con `localStorage` para que las tareas no se pierdan al recargar.
+- Editar el estado y la persona asignada desde la tarjeta (`updateTask` y `assignTask` ya existen, pero no tienen interfaz).
