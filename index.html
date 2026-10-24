@@ -6,51 +6,56 @@
     <title>Planificador de Tareas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/app.js" defer></script>
 </head>
-<body class="bg-light">
+<body class="app-body">
 
-    <header class="bg-primary text-white py-3 mb-4">
+    <header class="app-header pt-4 mb-4 text-center">
         <div class="container">
-            <h1 class="h3 mb-0">Mi Planificador de Tareas</h1>
+            <div class="header-box">
+                <h1 class="app-title mb-0">🌸 Mi Planificador de Tareas</h1>
+                <p class="mb-0 mt-1 app-subtitle">Organiza tu día con cariño ✨</p>
+            </div>
         </div>
     </header>
 
     <main class="container">
 
-        <section id="task-form-section" class="card shadow-sm mb-4">
+        <section id="task-form-section" class="form-card card mb-4">
             <div class="card-body">
-                <h2 class="h5 mb-3">Agregar nueva tarea</h2>
+                <h2 class="section-title h5 mb-3">📚 Agregar nueva tarea</h2>
 
                 <form id="task-form" class="row g-3" novalidate>
                     <div class="col-12">
-                        <div id ="form-errors" class="alert alert-danger d-none " role="alert"></div>
+                        <div id ="form-errors" class="form-errors alert alert-danger d-none" role="alert"></div>
                     </div>
 
                     <div class="col-md-6">
                         <label for="task-name" class="form-label">Nombre</label>
-                        <input type="text" id="task-name" class="form-control" placeholder="Ej: Estudiar para el parcial" required>
+                        <input type="text" id="task-name" name="nombre" class="form-control" placeholder="Ej: Estudiar para el parcial" required>
                     </div>
 
                     <div class="col-md-6">
                         <label for="task-assignee" class="form-label">Asignado a</label>
-                        <input type="text" id="task-assignee" class="form-control" placeholder="Nombre del responsable" required>
+                        <input type="text" id="task-assignee" name="asignadoA" class="form-control" placeholder="Nombre del responsable" required>
                     </div>
 
                     <div class="col-12">
                         <label for="task-description" class="form-label">Descripción</label>
-                        <textarea id="task-description" class="form-control" rows="3" placeholder="Detalles de la tarea" required></textarea>
+                        <textarea id="task-description" name="descripcion" class="form-control" rows="3" placeholder="Detalles de la tarea" required></textarea>
                     </div>
 
                     <div class="col-md-6">
                         <label for="task-due-date" class="form-label">Fecha de entrega</label>
-                        <input type="date" id="task-due-date" class="form-control" required>
+                        <input type="date" id="task-due-date" name="fechaDeEntrega" class="form-control" required>
                     </div>
 
                     <div class="col-md-6">
                         <label for="task-status" class="form-label">Estado</label>
-                        <select id="task-status" class="form-select" required>
+                        <select id="task-status" name="estado" class="form-select" required>
                             <option value="">-- Selecciona un estado --</option>
                             <option value="POR HACER">POR HACER</option>
                             <option value="EN PROCESO">EN PROCESO</option>
@@ -60,14 +65,14 @@
                     </div>
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Añadir tarea</button>
+                        <button type="submit" class="btn btn-cute">Añadir tarea</button>
                     </div>
                 </form>
             </div>
         </section>
 
         <section>
-            <h2 class="h5 mb-3">Mis tareas</h2>
+            <h2 class="section-title h5 mb-3">🗂️ Mis tareas</h2>
             <div id="task-container" class="row g-3"></div>
         </section>
 
@@ -76,7 +81,7 @@
 
     </main>
 
-    <footer class="text-center text-muted py-4 mt-4">
+    <footer class="app-footer text-center py-4 mt-4">
         <p class="mb-0">&copy; 2026 Planificador de Tareas</p>
     </footer>
 

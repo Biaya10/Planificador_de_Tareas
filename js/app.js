@@ -1,3 +1,17 @@
+// Color del badge según el estado
+const STATUS_COLORS = {
+    "POR HACER": "status-por-hacer",
+    "EN PROCESO": "status-en-proceso",
+    "REVISIÓN": "status-revision",
+    "HECHO": "status-hecho"
+};
+
+// Convierte "2026-11-02" en "02/11/2026" solo para mostrarlo
+function formatDate(isoDate) {
+    const [year, month, day] = isoDate.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 //TaskManager
 class Task {
     constructor(nombre, descripcion, asignadoA, fechaDeEntrega, estado){
@@ -63,7 +77,8 @@ class TaskManager{
         col.id = `task-${task.id}`;          // lo usaremos para eliminarla en la Tarea 4
 
         const card = document.createElement("div");
-        card.className = "card h-100 shadow-sm";
+        card.className = "task-card card h-100";
+        card.dataset.status = task.estado;      // el CSS colorea la franja según el estado
 
         const body = document.createElement("div");
         body.className = "card-body";
@@ -78,20 +93,20 @@ class TaskManager{
 
         const assignee = document.createElement("p");
         assignee.className = "mb-1";
-        assignee.textContent = `Asignado a: ${task.asignadoA}`;
+        assignee.textContent = `👤 Asignado a: ${task.asignadoA}`;
 
         const dueDate = document.createElement("p");
         dueDate.className = "mb-1";
-        dueDate.textContent = `Fecha de entrega: ${task.fechaDeEntrega}`;
+        dueDate.textContent = `📅 Entrega: ${formatDate(task.fechaDeEntrega)}`;
 
         const status = document.createElement("span");
-        status.className = "badge bg-secondary";
+        status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
         status.textContent = task.estado;
 
         //boton delete tarea
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
-        deleteButton.className = "btn btn-danger btn-sm mt-3 d-block";
+        deleteButton.className = "btn btn-delete btn-sm mt-3 d-block";
         deleteButton.textContent = "Eliminar";
 
         //connexoón con deletetask
@@ -109,6 +124,20 @@ class TaskManager{
 }
 
 const taskManager = new TaskManager();
+
+// Tareas de ejemplo que se muestran al cargar la página
+const sampleTasks = [
+    new Task("Diseñar wireframes", "Dibujar los wireframes del formulario y de la lista de tareas.", "Amanda Chindoy", "2026-11-02", "HECHO"),
+    new Task("Maquetar con Bootstrap", "Implementar el formulario y las tarjetas usando clases de Bootstrap.", "Amanda Chindoy", "2026-11-05", "EN PROCESO"),
+    new Task("Validar el formulario", "Validar todos los campos con JavaScript y mostrar mensajes de error.", "Carlos Pérez", "2026-11-08", "REVISIÓN"),
+    new Task("Escribir el README", "Documentar cómo ejecutar y usar el planificador de tareas.", "Laura Gómez", "2026-11-10", "POR HACER"),
+    new Task("Preparar la demo", "Ensayar la presentación del proyecto para la reflexión del sprint.", "Juan Torres", "2026-11-12", "POR HACER")
+];
+
+sampleTasks.forEach((task) => {
+    taskManager.addTask(task);
+    document.getElementById("task-container").append(taskManager.createTaskCard(task));
+});
 
 
 
@@ -143,7 +172,7 @@ function validateTaskForm(){
         }
     
     if(description.length <= 15){
-            errors.push("La descripción no puede estar vacía y debe tener más de 15 carácteres.");
+            errors.push("La descripción no puede estar vacía y debe tener más de 15 caracteres.");
         }
 
     if (assignee.length <= 8){
