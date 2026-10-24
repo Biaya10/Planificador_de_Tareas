@@ -1,0 +1,171 @@
+/* Paleta pastel */
+:root {
+    --crema: #fbf5ee;
+    --rosa: #f7c6dc;
+    --rosa-fuerte: #ee9fc3;
+    --rosa-oscuro: #c2578a;
+    --rosa-claro: #fde8f1;
+    --lila: #d9ccf5;
+    --lila-claro: #efe9fc;
+    --tinta: #2f2a3c;
+}
+
+.app-body {
+    font-family: "Quicksand", sans-serif;
+    font-size: 1.05rem;
+    color: var(--tinta);
+    background: var(--crema);
+}
+
+/* Encabezado */
+.app-header {
+    color: var(--tinta);
+}
+
+.header-box {
+    display: block;
+    background: linear-gradient(120deg, #f4a8cb 0%, #cdb4f0 100%);
+    padding: 1.6rem 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 6px 16px rgba(194, 87, 138, 0.25);
+}
+
+.app-title {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 600;
+    font-size: 2.5rem;
+}
+
+.app-subtitle {
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+/* Títulos de sección */
+.section-title {
+    font-weight: 700;
+    color: var(--tinta);
+}
+
+/* Formulario */
+.form-card {
+    border: 2px solid var(--rosa-claro);
+    border-left: 10px solid var(--rosa);
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(217, 204, 245, 0.45);
+}
+
+.form-label {
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid var(--lila-claro);
+    border-radius: 1rem;
+    font-family: inherit;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--rosa-fuerte);
+    box-shadow: 0 0 0 0.25rem rgba(247, 198, 220, 0.5);
+}
+
+.btn-cute {
+    background: var(--lila);
+    color: var(--tinta);
+    border: none;
+    border-radius: 2rem;
+    padding: 0.5rem 1.6rem;
+    font-weight: 700;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-cute:hover {
+    background: var(--rosa);
+    color: var(--tinta);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(194, 87, 138, 0.25);
+}
+
+/* Mensajes de error */
+.form-errors {
+    background: #ffe9ef;
+    border: 2px solid #ffb3c9;
+    border-radius: 1rem;
+    color: #b0305f;
+}
+
+.form-errors div + div {
+    margin-top: 0.25rem;
+}
+
+/* Tarjetas de tarea: la franja superior cambia según el estado */
+.task-card {
+    --acento: var(--lila);
+    border: 2px solid var(--lila-claro);
+    border-top: 8px solid var(--acento);
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(217, 204, 245, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-5px) rotate(-0.5deg);
+    box-shadow: 0 12px 24px rgba(247, 198, 220, 0.6);
+}
+
+.task-card .card-title {
+    color: var(--tinta);
+    font-weight: 700;
+}
+
+.task-badge {
+    font-size: 0.8rem;
+    border-radius: 2rem;
+    padding: 0.4em 0.9em;
+}
+
+.status-por-hacer { background: var(--lila); color: var(--tinta); }
+.status-en-proceso { background: var(--rosa); color: var(--tinta); }
+.status-revision { background: #fbe9b7; color: var(--tinta); }
+.status-hecho { background: #cfeedd; color: var(--tinta); }
+
+.btn-delete {
+    background: var(--rosa-claro);
+    color: var(--rosa-oscuro);
+    border: 2px solid var(--rosa-fuerte);
+    border-radius: 2rem;
+    font-weight: 600;
+}
+
+.btn-delete:hover {
+    background: var(--rosa-fuerte);
+    color: var(--tinta);
+}
+
+/* Color de la franja según el estado */
+.task-card[data-status="POR HACER"] { --acento: var(--lila); }
+.task-card[data-status="EN PROCESO"] { --acento: var(--rosa-fuerte); }
+.task-card[data-status="REVISIÓN"] { --acento: #f5d77a; }
+.task-card[data-status="HECHO"] { --acento: #8fd3ae; }
+
+/* Pie de página */
+.app-footer {
+    color: var(--tinta);
+    font-weight: 500;
+}
+
+/* Celulares: título más pequeño para que no se desborde */
+@media (max-width: 576px) {
+    .header-box {
+        padding: 0.8rem 1.2rem;
+    }
+
+    .app-title {
+        font-size: 1.6rem;
+    }
+}
