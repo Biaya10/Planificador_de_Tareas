@@ -1,199 +1,255 @@
 // Color del badge según el estado
 const STATUS_COLORS = {
-    "POR HACER": "status-por-hacer",
-    "EN PROCESO": "status-en-proceso",
-    "REVISIÓN": "status-revision",
-    "HECHO": "status-hecho"
+  "POR HACER": "status-por-hacer",
+  "EN PROCESO": "status-en-proceso",
+  REVISIÓN: "status-revision",
+  HECHO: "status-hecho",
 };
 
 // Convierte "2026-11-02" en "02/11/2026" solo para mostrarlo
 function formatDate(isoDate) {
-    const [year, month, day] = isoDate.split("-");
-    return `${day}/${month}/${year}`;
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
 }
 
 //TaskManager
 class Task {
-    constructor(nombre, descripcion, asignadoA, fechaDeEntrega, estado){
-        this.id = null;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.asignadoA = asignadoA;
-        this.fechaDeEntrega = fechaDeEntrega;
-        this.estado = estado;
-    }
+  constructor(nombre, descripcion, asignadoA, fechaDeEntrega, estado) {
+    this.id = null;
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.asignadoA = asignadoA;
+    this.fechaDeEntrega = fechaDeEntrega;
+    this.estado = estado;
+  }
 }
 
-class TaskManager{
-    constructor(){
-        this.tasks = [];  //array donde viven las tareas
-        this.currentId = 0;   //contador para generar IDS unicos
+class TaskManager {
+  constructor() {
+    this.tasks = []; //array donde viven las tareas
+    this.currentId = 0; //contador para generar IDS unicos
+  }
+
+  getAllTasks() {
+    //devuele todas las tareas
+    return this.tasks;
+  }
+
+  //devuelve solo tareas con estado indicado
+  getTasksWithStatus(status) {
+    return this.tasks.filter((task) => task.estado === status);
+  }
+
+  //Asigna un ID nuevo y guarda
+  addTask(task) {
+    this.currentId++;
+    task.id = this.currentId;
+    this.tasks.push(task);
+    return task;
+  }
+
+  //quitar del array la tarea con ID
+  deleteTask(taskId) {
+    this.tasks = this.tasks.filter((task) => task.id !== taskId);
+  }
+
+  //Cambia el estado de una tarea
+  updateTask(taskId, status) {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (task) {
+      task.estado = status;
     }
+  }
 
-
-    getAllTasks() {      //devuele todas las tareas
-        return this.tasks;
-        }
-
-    //devuelve solo tareas con estado indicado
-    getTasksWithStatus(status){
-        return this.tasks.filter((task) => task.estado === status);
-        }
-
-    //Asigna un ID nuevo y guarda
-    addTask(task){
-        this.currentId++;
-        task.id = this.currentId;
-        this.tasks.push(task);
-        return task;
-        }
-
-    //quitar del array la tarea con ID
-    deleteTask(taskId){
-        this.tasks = this.tasks.filter((task) => task.id !== taskId);
-        }
-
-    //Cambia el estado de una tarea
-    updateTask(taskId, status){
-        const task = this.tasks.find((t) => t.id === taskId);
-        if(task){
-            task.estado = status;
-            }
-        }
-
-    //Cambia la persona asignada
-    assignTask(taskId, assignee){
-        const task = this.tasks.find((t) => t.id === taskId);
-        if(task){
-            task.asignadoA = assignee;
-            }
-        }
-
-    //Crear la tarjeta: recibe una tarea y devuel el elemento HTML
-        
-    createTaskCard(task) {
-        const col = document.createElement("div");
-        col.className = "col-md-4";
-        col.id = `task-${task.id}`;          // lo usaremos para eliminarla en la Tarea 4
-
-        const card = document.createElement("div");
-        card.className = "task-card card h-100";
-        card.dataset.status = task.estado;      // el CSS colorea la franja según el estado
-
-        const body = document.createElement("div");
-        body.className = "card-body";
-
-        const title = document.createElement("h3");
-        title.className = "card-title h5";
-        title.textContent = task.nombre;
-
-        const description = document.createElement("p");
-        description.className = "card-text";
-        description.textContent = task.descripcion;
-
-        const assignee = document.createElement("p");
-        assignee.className = "mb-1";
-        assignee.textContent = `👤 Asignado a: ${task.asignadoA}`;
-
-        const dueDate = document.createElement("p");
-        dueDate.className = "mb-1";
-        dueDate.textContent = `📅 Entrega: ${formatDate(task.fechaDeEntrega)}`;
-
-        const status = document.createElement("span");
-        status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
-        status.textContent = task.estado;
-
-        //boton delete tarea
-        const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "btn btn-delete btn-sm mt-3 d-block";
-        deleteButton.textContent = "Eliminar";
-
-        //connexoón con deletetask
-        deleteButton.addEventListener("click", () => {
-            this.deleteTask(task.id);   // 1. la quita del array
-            col.remove();               // 2. quita la tarjeta del DOM
-        });
-
-        body.append(title, description, assignee, dueDate, status, deleteButton);
-        card.append(body);
-        col.append(card);
-        return col;                          // devuelve la tarjeta creada
+  //Cambia la persona asignada
+  assignTask(taskId, assignee) {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (task) {
+      task.asignadoA = assignee;
     }
+  }
+  //Busca una tarea por su ID
+  getTaskById(taskId) {
+    return this.tasks.find((task) => task.id === taskId);
+  }
 
+  //Crear la tarjeta: recibe una tarea y devuel el elemento HTML
+
+  createTaskCard(task) {
+    const col = document.createElement("div");
+    col.className = "col-md-4";
+    col.id = `task-${task.id}`; // lo usaremos para eliminarla en la Tarea 4
+    col.dataset.taskId = task.id; // pone el Id de la tarea en el HTML
+
+    const card = document.createElement("div");
+    card.className = "task-card card h-100";
+    card.dataset.status = task.estado; // el CSS colorea la franja según el estado
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+
+    const title = document.createElement("h3");
+    title.className = "card-title h5";
+    title.textContent = task.nombre;
+
+    const description = document.createElement("p");
+    description.className = "card-text";
+    description.textContent = task.descripcion;
+
+    const assignee = document.createElement("p");
+    assignee.className = "mb-1";
+    assignee.textContent = `👤 Asignado a: ${task.asignadoA}`;
+
+    const dueDate = document.createElement("p");
+    dueDate.className = "mb-1";
+    dueDate.textContent = `📅 Entrega: ${formatDate(task.fechaDeEntrega)}`;
+
+    const status = document.createElement("span");
+    status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
+    status.textContent = task.estado;
+
+    //Boton completar tarea, donebutton
+    const doneButton = document.createElement("button");
+    doneButton.type = "button";
+    doneButton.className = "btn btn-success btn-sm mt-3 d-block done-button";
+    doneButton.textContent = "Completar";
+
+    //boton delete tarea
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "btn btn-delete btn-sm mt-3 d-block";
+    deleteButton.textContent = "Eliminar";
+
+    //connexoón con deletetask
+    deleteButton.addEventListener("click", () => {
+      this.deleteTask(task.id); // 1. la quita del array
+      col.remove(); // 2. quita la tarjeta del DOM
+    });
+
+    body.append(title, description, assignee, dueDate, status);
+    if (task.estado !== "HECHO") {
+      body.append(doneButton);
+    }
+    body.append(deleteButton);
+
+    card.append(body);
+    col.append(card);
+    return col; // devuelve la tarjeta creada
+  }
+
+  render() {
+    const container = document.getElementById("task-container");
+    container.innerHTML = "";
+    this.tasks.forEach((task) => {
+      container.append(this.createTaskCard(task));
+    });
+  }
 }
 
 const taskManager = new TaskManager();
 
 // Tareas de ejemplo que se muestran al cargar la página
 const sampleTasks = [
-    new Task("Diseñar wireframes", "Dibujar los wireframes del formulario y de la lista de tareas.", "Amanda Chindoy", "2026-11-02", "HECHO"),
-    new Task("Maquetar con Bootstrap", "Implementar el formulario y las tarjetas usando clases de Bootstrap.", "Amanda Chindoy", "2026-11-05", "EN PROCESO"),
-    new Task("Validar el formulario", "Validar todos los campos con JavaScript y mostrar mensajes de error.", "Carlos Pérez", "2026-11-08", "REVISIÓN"),
-    new Task("Escribir el README", "Documentar cómo ejecutar y usar el planificador de tareas.", "Laura Gómez", "2026-11-10", "POR HACER"),
-    new Task("Preparar la demo", "Ensayar la presentación del proyecto para la reflexión del sprint.", "Juan Torres", "2026-11-12", "POR HACER")
+  new Task(
+    "Diseñar wireframes",
+    "Dibujar los wireframes del formulario y de la lista de tareas.",
+    "Amanda Chindoy",
+    "2026-11-02",
+    "HECHO",
+  ),
+  new Task(
+    "Maquetar con Bootstrap",
+    "Implementar el formulario y las tarjetas usando clases de Bootstrap.",
+    "Amanda Chindoy",
+    "2026-11-05",
+    "EN PROCESO",
+  ),
+  new Task(
+    "Validar el formulario",
+    "Validar todos los campos con JavaScript y mostrar mensajes de error.",
+    "Carlos Pérez",
+    "2026-11-08",
+    "REVISIÓN",
+  ),
+  new Task(
+    "Escribir el README",
+    "Documentar cómo ejecutar y usar el planificador de tareas.",
+    "Laura Gómez",
+    "2026-11-10",
+    "POR HACER",
+  ),
+  new Task(
+    "Preparar la demo",
+    "Ensayar la presentación del proyecto para la reflexión del sprint.",
+    "Juan Torres",
+    "2026-11-12",
+    "POR HACER",
+  ),
 ];
 
 sampleTasks.forEach((task) => {
-    taskManager.addTask(task);
-    document.getElementById("task-container").append(taskManager.createTaskCard(task));
+  taskManager.addTask(task);
 });
-
-
-
+taskManager.render();
 
 //Muestra la lista en el div HTML
 
-function showErrors(errors){
-    const errorBox = document.getElementById("form-errors");
-    errorBox.innerHTML = errors.map((e) => `<div>${e}</div>`).join("");
-    errorBox.classList.remove("d-none");
+function showErrors(errors) {
+  const errorBox = document.getElementById("form-errors");
+  errorBox.innerHTML = errors.map((e) => `<div>${e}</div>`).join("");
+  errorBox.classList.remove("d-none");
 }
 
-function clearErrors(){
-    const errorBox = document.getElementById("form-errors");
-    errorBox.innerHTML = "";
-    errorBox.classList.add("d-none");
+function clearErrors() {
+  const errorBox = document.getElementById("form-errors");
+  errorBox.innerHTML = "";
+  errorBox.classList.add("d-none");
 }
 
 //Devuelve true si todo es válido, false si hay error
 
-function validateTaskForm(){
-    const name = document.getElementById("task-name").value.trim();  //trim quita espacios
-    const description = document.getElementById("task-description").value.trim();
-    const assignee = document.getElementById("task-assignee").value.trim();
-    const dueDate = document.getElementById("task-due-date").value;
-    const status = document.getElementById("task-status").value;
+function validateTaskForm() {
+  const name = document.getElementById("task-name").value.trim(); //trim quita espacios
+  const description = document.getElementById("task-description").value.trim();
+  const assignee = document.getElementById("task-assignee").value.trim();
+  const dueDate = document.getElementById("task-due-date").value;
+  const status = document.getElementById("task-status").value;
 
-    const errors = [];
+  const errors = [];
 
-    if (name.length <= 8){
-        errors.push("El nombre no puede estar vacío y debe tener más de 8 caracteres.");
-        }
-    
-    if(description.length <= 15){
-            errors.push("La descripción no puede estar vacía y debe tener más de 15 caracteres.");
-        }
+  if (name.length <= 8) {
+    errors.push(
+      "El nombre no puede estar vacío y debe tener más de 8 caracteres.",
+    );
+  }
 
-    if (assignee.length <= 8){
-        errors.push("El campo 'Asignado a' no puede estar vacío y debe tener más de 8 caracteres.");
-        }
+  if (description.length <= 15) {
+    errors.push(
+      "La descripción no puede estar vacía y debe tener más de 15 caracteres.",
+    );
+  }
 
-    if(dueDate === ""){
-        errors.push("La fecha de entrega es obligatoria.");
-        }
+  if (assignee.length <= 8) {
+    errors.push(
+      "El campo 'Asignado a' no puede estar vacío y debe tener más de 8 caracteres.",
+    );
+  }
 
-    if(status === ""){
-        errors.push("Debes seleccionar un estado.");
-         }
+  if (dueDate === "") {
+    errors.push("La fecha de entrega es obligatoria.");
+  }
 
-    if(errors.length > 0){
-        showErrors(errors);
-        return false;
-    }
+  if (status === "") {
+    errors.push("Debes seleccionar un estado.");
+  }
 
-    clearErrors();
-    return true;
+  if (errors.length > 0) {
+    showErrors(errors);
+    return false;
+  }
+
+  clearErrors();
+  return true;
 }
 
 //conectar form
@@ -201,26 +257,39 @@ function validateTaskForm(){
 const taskForm = document.getElementById("task-form");
 
 taskForm.addEventListener("submit", (event) => {
-    event.preventDefault();          // evita que la página se recargue
+  event.preventDefault(); // evita que la página se recargue
 
-    if (!validateTaskForm()) {
-        return;                      // si falla, no se agrega la tarea
-    }
+  if (!validateTaskForm()) {
+    return; // si falla, no se agrega la tarea
+  }
 
-    // Leer los valores de los campos
-    const name = document.getElementById("task-name").value.trim();
-    const description = document.getElementById("task-description").value.trim();
-    const assignee = document.getElementById("task-assignee").value.trim();
-    const dueDate = document.getElementById("task-due-date").value;
-    const status = document.getElementById("task-status").value;
+  // Leer los valores de los campos
+  const name = document.getElementById("task-name").value.trim();
+  const description = document.getElementById("task-description").value.trim();
+  const assignee = document.getElementById("task-assignee").value.trim();
+  const dueDate = document.getElementById("task-due-date").value;
+  const status = document.getElementById("task-status").value;
 
-    // Crear la tarea y guardarla en el array (aquí se le asigna el ID)
-    const task = new Task(name, description, assignee, dueDate, status);
-    taskManager.addTask(task);
+  // Crear la tarea y guardarla en el array (aquí se le asigna el ID)
+  const task = new Task(name, description, assignee, dueDate, status);
+  taskManager.addTask(task);
 
-    // Crear la tarjeta y agregarla al contenedor de la página
-    const card = taskManager.createTaskCard(task);
-    document.getElementById("task-container").append(card);
+  taskManager.render(); // redibuja la lista con la tarea nueva
 
-    taskForm.reset();                // limpia el formulario
+  taskForm.reset(); // limpia el formulario
+});
+
+//Un solo listener para toda la lista(delegación de eventos)
+const taskList = document.querySelector("#task-container");
+
+taskList.addEventListener("click", (event) => {
+  // event.target es el elemento donde se hizo clic
+  if (event.target.classList.contains("done-button")) {
+    //El if comprueba si ese elemento es un botón "Completar".
+    const taskElement = event.target.closest("[data-task-id]"); // closest("[data-task-id]") sube por el DOM hasta encontrar la tarjeta que tiene el atributo data-task-id.
+
+    const taskId = Number(taskElement.dataset.taskId); // texto -> número
+    taskManager.updateTask(taskId, "HECHO"); // cambia el estado
+    taskManager.render(); // redibuja la lista
+  }
 });
