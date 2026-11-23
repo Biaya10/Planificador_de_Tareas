@@ -12,7 +12,7 @@ function formatDate(isoDate) {
   return `${day}/${month}/${year}`;
 }
 
-//TaskManager
+// Task: representa una tarea con sus datos (el id lo asigna TaskManager)
 class Task {
   constructor(nombre, descripcion, asignadoA, fechaDeEntrega, estado) {
     this.id = null;
@@ -24,14 +24,16 @@ class Task {
   }
 }
 
+// TaskManager: guarda la lista de tareas, las modifica,
+// las dibuja en pantalla (render) y las persiste en localStorage (save/load)
 class TaskManager {
   constructor() {
-    this.tasks = []; //array donde viven las tareas
-    this.currentId = 0; //contador para generar IDS unicos
+    this.tasks = []; // array donde viven las tareas
+    this.currentId = 0; // contador para generar ids únicos
   }
 
+  // Devuelve todas las tareas
   getAllTasks() {
-    //devuele todas las tareas
     return this.tasks;
   }
 
@@ -40,7 +42,7 @@ class TaskManager {
     return this.tasks.filter((task) => task.estado === status);
   }
 
-  //Asigna un ID nuevo y guarda
+  // Le asigna un id nuevo a la tarea y la agrega al array
   addTask(task) {
     this.currentId++;
     task.id = this.currentId;
@@ -53,7 +55,7 @@ class TaskManager {
     this.tasks = this.tasks.filter((task) => task.id !== taskId);
   }
 
-  //Cambia el estado de una tarea
+  // Cambia solo el estado de una tarea (lo usa el botón "Completar")
   updateTask(taskId, status) {
     const task = this.tasks.find((t) => t.id === taskId);
     if (task) {
@@ -61,7 +63,8 @@ class TaskManager {
     }
   }
 
-  //Edita todos los campos de una tarea
+  // Edita todos los campos de una tarea (lo usa el formulario en modo "Actualizar").
+  // "data" es un objeto con: nombre, descripcion, asignadoA, fechaDeEntrega y estado
   editTask(taskId, data) {
     const task = this.getTaskById(taskId);
     if (task) {
@@ -80,7 +83,8 @@ class TaskManager {
       task.asignadoA = assignee;
     }
   }
-  //Busca una tarea por su ID
+
+  // Busca una tarea por su id y la devuelve (o undefined si no existe)
   getTaskById(taskId) {
     return this.tasks.find((task) => task.id === taskId);
   }
@@ -90,8 +94,8 @@ class TaskManager {
   createTaskCard(task) {
     const col = document.createElement("div");
     col.className = "col-md-4";
-    col.id = `task-${task.id}`; // lo usaremos para eliminarla en la Tarea 4
-    col.dataset.taskId = task.id; // pone el Id de la tarea en el HTML
+    col.id = `task-${task.id}`;
+    col.dataset.taskId = task.id; // guarda el id en el HTML (data-task-id) para saber de qué tarea es la tarjeta
 
     const card = document.createElement("div");
     card.className = "task-card card h-100";
@@ -120,26 +124,27 @@ class TaskManager {
     status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
     status.textContent = task.estado;
 
-    //Boton completar tarea, donebutton
+    // Botón "Completar": la clase done-button sirve para detectarlo al hacer clic
     const doneButton = document.createElement("button");
     doneButton.type = "button";
     doneButton.className = "btn btn-success btn-sm mt-3 d-block done-button";
     doneButton.textContent = "Completar";
 
-    //boton delete tarea
+    // Botón "Eliminar"
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "btn btn-delete btn-sm mt-3 d-block";
     deleteButton.textContent = "Eliminar";
 
-    //connexoón con deletetask
+    // Al hacer clic en "Eliminar"
     deleteButton.addEventListener("click", () => {
       this.deleteTask(task.id); // 1. la quita del array
       col.remove(); // 2. quita la tarjeta del DOM
-      this.save(); //3. guarda el cambio en localStorage
+      this.save(); // 3. guarda el cambio en localStorage
     });
 
     body.append(title, description, assignee, dueDate, status);
+    // "Completar" solo aparece si la tarea todavía no está en HECHO
     if (task.estado !== "HECHO") {
       body.append(doneButton);
     }
@@ -150,6 +155,7 @@ class TaskManager {
     return col; // devuelve la tarjeta creada
   }
 
+  // Redibuja toda la lista: limpia el contenedor y crea una tarjeta por cada tarea
   render() {
     const container = document.getElementById("task-container");
     container.innerHTML = "";
@@ -158,26 +164,30 @@ class TaskManager {
     });
   }
 
-  //Metodo save
+  // Guarda las tareas y el contador de ids en localStorage.
+  // localStorage solo guarda texto, por eso el arreglo se convierte con JSON.stringify
   save() {
-    localStorage.setItem("tasks", JSON.stringify(this.tasks)); //JSON convierte el arreglo de tareas en texto, porque localStorage guarda strings
-    localStorage.setItem("currentId", String(this.currentId)); //guarda currentId para que ids nuevos no se repitan despues de cargar
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    // se guarda el contador para que los ids nuevos no se repitan después de recargar
+    localStorage.setItem("currentId", String(this.currentId));
   }
 
-  //Metodo load()
+  // Recupera las tareas y el contador desde localStorage.
+  // Se revisa que no sea null porque JSON.parse(null) daría error si no hay nada guardado
   load() {
     const savedTasks = localStorage.getItem("tasks");
     if (savedTasks !== null) {
-      this.tasks = JSON.parse(savedTasks);
+      this.tasks = JSON.parse(savedTasks); // texto -> arreglo de tareas
     }
 
     const savedId = localStorage.getItem("currentId");
     if (savedId !== null) {
-      this.currentId = Number(savedId);
+      this.currentId = Number(savedId); // texto -> número
     }
   }
 }
 
+// Instancia que usa toda la página
 const taskManager = new TaskManager();
 
 // Tareas de ejemplo que se muestran al cargar la página
@@ -218,10 +228,12 @@ const sampleTasks = [
     "POR HACER",
   ),
 ];
-//los ejemplos solo se crean la primera vez(si no hay nada guardado)
+
+// Al abrir la página, el orden importa:
+// 1. cargar lo guardado, 2. crear los ejemplos solo si no hay nada, 3. dibujar la lista
 taskManager.load();
 
-if(taskManager.getAllTasks().length === 0){
+if (taskManager.getAllTasks().length === 0) {
   sampleTasks.forEach((task) => {
     taskManager.addTask(task);
   });
@@ -229,22 +241,22 @@ if(taskManager.getAllTasks().length === 0){
 }
 taskManager.render();
 
-//Muestra la lista en el div HTML
-
+// Muestra los mensajes de error del formulario en el div de errores
 function showErrors(errors) {
   const errorBox = document.getElementById("form-errors");
   errorBox.innerHTML = errors.map((e) => `<div>${e}</div>`).join("");
   errorBox.classList.remove("d-none");
 }
 
+// Oculta y vacía el div de errores
 function clearErrors() {
   const errorBox = document.getElementById("form-errors");
   errorBox.innerHTML = "";
   errorBox.classList.add("d-none");
 }
 
-//Devuelve true si todo es válido, false si hay error
-
+// Valida los campos del formulario.
+// Devuelve true si todo es válido, false si hay algún error (y lo muestra)
 function validateTaskForm() {
   const name = document.getElementById("task-name").value.trim(); //trim quita espacios
   const description = document.getElementById("task-description").value.trim();
@@ -289,20 +301,23 @@ function validateTaskForm() {
   return true;
 }
 
-//conectar form
+// ---- Formulario: guardar una tarea nueva o actualizar una existente ----
 
 const taskForm = document.getElementById("task-form");
 const submitButton = document.getElementById("task-submit");
-let editingTaskId = null; // null = modo "guardar"; un número = modo "actualizar"
-// Vuelve al modo "guardar" y limpia el formulario
+
+// Recuerda en qué modo está el formulario:
+// null = modo "Guardar" (tarea nueva); un número = modo "Actualizar" (id de la tarea editada)
+let editingTaskId = null;
+
+// Vuelve al modo "Guardar" y limpia el formulario
 function resetFormMode() {
   editingTaskId = null;
   submitButton.textContent = "Guardar";
   taskForm.reset();
 }
 
-
-//listener del formulario
+// Al enviar el formulario
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault(); // evita que la página se recargue
 
@@ -330,36 +345,39 @@ taskForm.addEventListener("submit", (event) => {
       fechaDeEntrega: dueDate,
       estado: status,
     });
-    editingTaskId = null;
+    editingTaskId = null; // vuelve al modo "Guardar"
     submitButton.textContent = "Guardar";
   }
+
   taskManager.render(); // redibuja la lista
   taskManager.save(); // guarda en localStorage
   taskForm.reset(); // limpia el formulario
 });
 
-//Un solo listener para toda la lista(delegación de eventos)
+// ---- Lista de tareas: un solo listener para todos los clics (delegación de eventos) ----
+// event.target es el elemento donde se hizo clic; con closest() se sube por el DOM
+// hasta la tarjeta que tiene el atributo data-task-id
 const taskList = document.querySelector("#task-container");
 
 taskList.addEventListener("click", (event) => {
-  // 1. Botón "Completar"
+  // 1. Botón "Completar": cambia el estado de la tarea a HECHO
   if (event.target.classList.contains("done-button")) {
     const taskElement = event.target.closest("[data-task-id]");
-    const taskId = Number(taskElement.dataset.taskId);
+    const taskId = Number(taskElement.dataset.taskId); // el dataset es texto, se pasa a número
     taskManager.updateTask(taskId, "HECHO");
     taskManager.render();
     taskManager.save();
 
-    // NUEVO: si esa tarea está cargada en el formulario, actualizar su estado
+    // Si esa tarea estaba cargada en el formulario, se actualiza también su estado ahí
     if (taskId === editingTaskId) {
       document.getElementById("task-status").value = "HECHO";
     }
     return;
   }
 
-  // 2. Otros botones (Eliminar tiene su propio listener): no editar
+  // 2. Otros botones ("Eliminar" tiene su propio listener): no se carga el formulario
   if (event.target.closest("button")) {
-    // NUEVO: si se eliminó la tarea que se estaba editando, salir del modo edición
+    // Si se eliminó la tarea que se estaba editando, se sale del modo "Actualizar"
     const taskElement = event.target.closest("[data-task-id]");
     if (taskElement && Number(taskElement.dataset.taskId) === editingTaskId) {
       resetFormMode();
@@ -367,9 +385,9 @@ taskList.addEventListener("click", (event) => {
     return;
   }
 
-  // 3. Clic en la tarjeta: cargar sus datos en el formulario
+  // 3. Clic en la tarjeta: se cargan sus datos en el formulario y se pasa al modo "Actualizar"
   const taskElement = event.target.closest("[data-task-id]");
-  if (!taskElement) return;
+  if (!taskElement) return; // clic fuera de una tarjeta
 
   const task = taskManager.getTaskById(Number(taskElement.dataset.taskId));
   document.getElementById("task-name").value = task.nombre;
@@ -381,3 +399,9 @@ taskList.addEventListener("click", (event) => {
   editingTaskId = task.id;
   submitButton.textContent = "Actualizar";
 });
+
+// Exporta las clases para las pruebas con Jest.
+// En el navegador "module" no existe, por eso este bloque no hace nada allí.
+if (typeof module !== "undefined") {
+  module.exports = { Task, TaskManager, taskManager };
+}
