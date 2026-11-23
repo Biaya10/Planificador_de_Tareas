@@ -124,6 +124,7 @@ class TaskManager {
     deleteButton.addEventListener("click", () => {
       this.deleteTask(task.id); // 1. la quita del array
       col.remove(); // 2. quita la tarjeta del DOM
+      this.save(); //3. guarda el cambio en localStorage
     });
 
     body.append(title, description, assignee, dueDate, status);
@@ -143,6 +144,25 @@ class TaskManager {
     this.tasks.forEach((task) => {
       container.append(this.createTaskCard(task));
     });
+  }
+
+  //Metodo save
+  save() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks)); //JSON convierte el arreglo de tareas en texto, porque localStorage guarda strings
+    localStorage.setItem("currentId", String(this.currentId)); //guarda currentId para que ids nuevos no se repitan despues de cargar
+  }
+
+  //Metodo load()
+  load() {
+    const savedTasks = localStorage.getItem("tasks");
+    if (savedTasks !== null) {
+      this.tasks = JSON.parse(savedTasks);
+    }
+
+    const savedId = localStorage.getItem("currentId");
+    if (savedId !== null) {
+      this.currentId = Number(savedId);
+    }
   }
 }
 
@@ -186,10 +206,15 @@ const sampleTasks = [
     "POR HACER",
   ),
 ];
+//los ejemplos solo se crean la primera vez(si no hay nada guardado)
+taskManager.load();
 
-sampleTasks.forEach((task) => {
-  taskManager.addTask(task);
-});
+if(taskManager.getAllTasks().length === 0){
+  sampleTasks.forEach((task) => {
+    taskManager.addTask(task);
+  });
+  taskManager.save();
+}
 taskManager.render();
 
 //Muestra la lista en el div HTML
@@ -273,9 +298,8 @@ taskForm.addEventListener("submit", (event) => {
   // Crear la tarea y guardarla en el array (aquí se le asigna el ID)
   const task = new Task(name, description, assignee, dueDate, status);
   taskManager.addTask(task);
-
   taskManager.render(); // redibuja la lista con la tarea nueva
-
+  taskManager.save(); // guarda en localStorage
   taskForm.reset(); // limpia el formulario
 });
 
@@ -291,5 +315,6 @@ taskList.addEventListener("click", (event) => {
     const taskId = Number(taskElement.dataset.taskId); // texto -> número
     taskManager.updateTask(taskId, "HECHO"); // cambia el estado
     taskManager.render(); // redibuja la lista
+    taskManager.save();  //
   }
 });
