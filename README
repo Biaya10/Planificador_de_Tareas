@@ -1,32 +1,51 @@
 # Planificador de Tareas
 
-Aplicación web hecha con HTML, Bootstrap 5.3 y JavaScript. Permite agregar tareas mediante un formulario validado, verlas como tarjetas y eliminarlas. Las tareas se guardan solo en memoria (no hay `localStorage` todavía).
+Aplicación web hecha con HTML, Bootstrap 5.3 y JavaScript. Permite agregar tareas mediante un formulario validado, verlas como tarjetas, marcarlas como HECHO, editarlas y eliminarlas. Las tareas se guardan en el navegador con `localStorage`, así que siguen ahí al recargar la página. El código tiene pruebas unitarias con Jest.
 
 ## Estructura
 
 ```
 Planificador_de_Tareas/
-├── index.html      # Formulario y contenedor de tareas
-├── css/style.css   # Estilos propios
-└── js/app.js       # Clases Task y TaskManager, validación y eventos
+├── index.html           # Formulario y contenedor de tareas
+├── css/style.css        # Estilos propios
+├── js/app.js            # Clases Task y TaskManager, validación y eventos
+├── tests/               # Pruebas unitarias (Jest + jsdom)
+│   ├── helpers.js           # Carga la app en un navegador simulado
+│   ├── taskManager.test.js  # Pruebas de la clase TaskManager
+│   └── ui.test.js           # Pruebas de la lista HTML
+└── package.json         # Dependencias y script de pruebas
 ```
 
 ## Cómo probarlo
 1. Abrir `index.html` en el navegador.
-2. Verificar que aparecen 5 tareas de ejemplo.
+2. Verificar que aparecen 5 tareas de ejemplo (solo la primera vez).
 3. Enviar el formulario vacío: deben aparecer los mensajes de error.
-4. Completar bien los datos y presionar **Añadir tarea**: la tarjeta nueva aparece.
-5. Presionar **Eliminar** en una tarjeta: desaparece de la pantalla y del arreglo.
+4. Completar bien los datos y presionar **Guardar**: la tarjeta nueva aparece.
+5. Presionar **Completar** en una tarjeta: el estado pasa a HECHO y el botón desaparece.
+6. Hacer clic en una tarjeta: sus datos pasan al formulario y el botón cambia a **Actualizar**. Cambiar un dato y presionar **Actualizar**: la tarjeta se actualiza, el botón vuelve a **Guardar** y el formulario queda vacío.
+7. Presionar **Eliminar** en una tarjeta: desaparece de la pantalla y del arreglo.
+8. Recargar la página (F5): las tareas y sus cambios siguen ahí.
+
+## Cómo correr las pruebas
+Se necesita tener Node.js instalado.
+
+```
+npm install
+npm test
+```
+
+Las pruebas cubren los métodos de `TaskManager` (agregar, eliminar, actualizar, asignar, editar, guardar y cargar) y comprueban en la lista HTML que al agregar una tarea aparece su tarjeta y que al eliminarla desaparece.
 
 ## Qué hace
 - **Validación** (`validateTaskForm`): nombre y "Asignado a" con más de 8 caracteres, descripción con más de 15, fecha obligatoria y estado seleccionado. Se usa `trim()` para ignorar espacios.
-- **Clase `TaskManager`**: `getAllTasks`, `getTasksWithStatus`, `addTask`, `deleteTask`, `updateTask` y `assignTask`. Un contador (`currentId`) genera IDs únicos.
+- **Clase `TaskManager`**: `getAllTasks`, `getTasksWithStatus`, `addTask`, `deleteTask`, `updateTask`, `editTask`, `assignTask`, `getTaskById`, `render`, `save` y `load`. Un contador (`currentId`) genera IDs únicos.
 - **Tarjetas**: muestran nombre, descripción, asignado a, fecha de entrega y estado.
 - **Estados**: POR HACER, EN PROCESO, REVISIÓN y HECHO (los de la guía del Sprint 2).
+- **Persistencia**: `save()` guarda las tareas (`tasks`) y el contador (`currentId`) en `localStorage` después de agregar, completar, editar o eliminar. `load()` los recupera al abrir la página.
 
 ## Decisiones de diseño y resolución de problemas
 
-**Restricciones del sprint:** las tareas viven solo en memoria; se evalúa la funcionalidad y no el diseño; hay reglas de validación fijas (más de 8 caracteres en nombre y asignado, más de 15 en descripción); y se exige JS en un archivo aparte, una clase `TaskManager` y un botón de eliminar.
+**Restricciones del Sprint 2:** las tareas vivían solo en memoria (en el Sprint 3 se agregó `localStorage`); se evalúa la funcionalidad y no el diseño; hay reglas de validación fijas (más de 8 caracteres en nombre y asignado, más de 15 en descripción); y se exige JS en un archivo aparte, una clase `TaskManager` y un botón de eliminar.
 
 ### 1. ¿Dónde validar el formulario?
 | Enfoque | Pros | Contras |
@@ -65,9 +84,9 @@ Planificador_de_Tareas/
 | Enfoque | Pros | Contras |
 |---|---|---|
 | `Date.now()` | No necesita estado | Puede repetirse si se agregan dos tareas muy seguidas |
-| Contador en `TaskManager` | Siempre único y creciente | Se reinicia al recargar (aceptable: aún no hay persistencia) |
+| Contador en `TaskManager` | Siempre único y creciente | Se reinicia al recargar, salvo que se guarde |
 
-**Decisión: contador.** Es único, creciente y encaja con la restricción de "solo en memoria".
+**Decisión: contador.** Es único y creciente. Desde el Sprint 3 el contador también se guarda en `localStorage` (clave `currentId`), para que después de recargar los ids nuevos sigan la numeración y no se repitan.
 
 ### 6. ¿Cómo eliminar una tarea?
 | Enfoque | Pros | Contras |
@@ -89,6 +108,29 @@ Implementé las decisiones anteriores en `js/app.js` y `index.html`. Probé el f
 | Validación del formulario | Se validan los 5 campos, con mensajes claros y JS en archivo separado. |
 | Resolución de problemas | Ver la sección "Decisiones de diseño" de este README. |
 
-## Pendiente para otros sprints(según doc- Sprint2)
-- Persistencia con `localStorage` para que las tareas no se pierdan al recargar.
-- Editar el estado y la persona asignada desde la tarjeta (`updateTask` y `assignTask` ya existen, pero no tienen interfaz).
+## Decisiones del Sprint 3
+
+### 7. ¿Cómo detectar los clics en los botones de las tarjetas?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| Un listener en cada botón | Fácil de entender | Hay que volver a crearlos cada vez que se redibuja la lista |
+| Un solo listener en la lista (delegación de eventos) | Funciona con tarjetas creadas después; menos listeners | Hay que subir por el DOM con `closest()` para encontrar la tarjeta |
+
+**Decisión: un solo listener** en `#task-container`. Cada tarjeta guarda su id en `data-task-id`, y con `Number(...)` se convierte a número para buscar la tarea.
+
+### 8. ¿Cómo editar una tarea?
+| Enfoque | Pros | Contras |
+|---|---|---|
+| Editar dentro de la tarjeta | Se ve en el mismo lugar | Hay que crear campos nuevos en cada tarjeta |
+| Reutilizar el formulario | Usa la misma validación y los mismos campos | Hay que recordar en qué modo está |
+
+**Decisión: reutilizar el formulario.** La variable `editingTaskId` es `null` en modo **Guardar** y guarda el id de la tarea en modo **Actualizar**. Si se elimina o se completa la tarea que se está editando, el formulario se ajusta para no quedar con datos viejos.
+
+### 9. ¿Cómo guardar en `localStorage`?
+`localStorage` solo guarda texto, así que el arreglo se convierte con `JSON.stringify` y se recupera con `JSON.parse`. Antes de parsear se revisa que no sea `null`. Las 5 tareas de ejemplo solo se crean si no hay nada guardado; así no se duplican al recargar.
+
+### 10. ¿Cómo probar el código?
+Se usa **Jest** para ejecutar las pruebas y **jsdom** para simular el navegador. Al final de `js/app.js` se exportan `Task` y `TaskManager` con un `if (typeof module !== "undefined")`, para que las pruebas puedan importarlos sin afectar al navegador. Cada prueba carga el `index.html` real y vacía `localStorage`, para empezar sin estado previo.
+
+## Posibles mejoras
+- `assignTask` existe y está probada, pero todavía no tiene interfaz para usarla desde la tarjeta.
