@@ -61,6 +61,18 @@ class TaskManager {
     }
   }
 
+  //Edita todos los campos de una tarea
+  editTask(taskId, data) {
+    const task = this.getTaskById(taskId);
+    if (task) {
+      task.nombre = data.nombre;
+      task.descripcion = data.descripcion;
+      task.asignadoA = data.asignadoA;
+      task.fechaDeEntrega = data.fechaDeEntrega;
+      task.estado = data.estado;
+    }
+  }
+
   //Cambia la persona asignada
   assignTask(taskId, assignee) {
     const task = this.tasks.find((t) => t.id === taskId);
@@ -280,7 +292,17 @@ function validateTaskForm() {
 //conectar form
 
 const taskForm = document.getElementById("task-form");
+const submitButton = document.getElementById("task-submit");
+let editingTaskId = null; // null = modo "guardar"; un número = modo "actualizar"
+// Vuelve al modo "guardar" y limpia el formulario
+function resetFormMode() {
+  editingTaskId = null;
+  submitButton.textContent = "Guardar";
+  taskForm.reset();
+}
 
+
+//listener del formulario
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault(); // evita que la página se recargue
 
@@ -295,10 +317,23 @@ taskForm.addEventListener("submit", (event) => {
   const dueDate = document.getElementById("task-due-date").value;
   const status = document.getElementById("task-status").value;
 
-  // Crear la tarea y guardarla en el array (aquí se le asigna el ID)
-  const task = new Task(name, description, assignee, dueDate, status);
-  taskManager.addTask(task);
-  taskManager.render(); // redibuja la lista con la tarea nueva
+  if (editingTaskId === null) {
+    // Modo guardar: tarea nueva
+    const task = new Task(name, description, assignee, dueDate, status);
+    taskManager.addTask(task);
+  } else {
+    // Modo actualizar: se modifica la tarea existente
+    taskManager.editTask(editingTaskId, {
+      nombre: name,
+      descripcion: description,
+      asignadoA: assignee,
+      fechaDeEntrega: dueDate,
+      estado: status,
+    });
+    editingTaskId = null;
+    submitButton.textContent = "Guardar";
+  }
+  taskManager.render(); // redibuja la lista
   taskManager.save(); // guarda en localStorage
   taskForm.reset(); // limpia el formulario
 });
@@ -307,14 +342,42 @@ taskForm.addEventListener("submit", (event) => {
 const taskList = document.querySelector("#task-container");
 
 taskList.addEventListener("click", (event) => {
-  // event.target es el elemento donde se hizo clic
+  // 1. Botón "Completar"
   if (event.target.classList.contains("done-button")) {
-    //El if comprueba si ese elemento es un botón "Completar".
-    const taskElement = event.target.closest("[data-task-id]"); // closest("[data-task-id]") sube por el DOM hasta encontrar la tarjeta que tiene el atributo data-task-id.
+    const taskElement = event.target.closest("[data-task-id]");
+    const taskId = Number(taskElement.dataset.taskId);
+    taskManager.updateTask(taskId, "HECHO");
+    taskManager.render();
+    taskManager.save();
 
-    const taskId = Number(taskElement.dataset.taskId); // texto -> número
-    taskManager.updateTask(taskId, "HECHO"); // cambia el estado
-    taskManager.render(); // redibuja la lista
-    taskManager.save();  //
+    // NUEVO: si esa tarea está cargada en el formulario, actualizar su estado
+    if (taskId === editingTaskId) {
+      document.getElementById("task-status").value = "HECHO";
+    }
+    return;
   }
+
+  // 2. Otros botones (Eliminar tiene su propio listener): no editar
+  if (event.target.closest("button")) {
+    // NUEVO: si se eliminó la tarea que se estaba editando, salir del modo edición
+    const taskElement = event.target.closest("[data-task-id]");
+    if (taskElement && Number(taskElement.dataset.taskId) === editingTaskId) {
+      resetFormMode();
+    }
+    return;
+  }
+
+  // 3. Clic en la tarjeta: cargar sus datos en el formulario
+  const taskElement = event.target.closest("[data-task-id]");
+  if (!taskElement) return;
+
+  const task = taskManager.getTaskById(Number(taskElement.dataset.taskId));
+  document.getElementById("task-name").value = task.nombre;
+  document.getElementById("task-description").value = task.descripcion;
+  document.getElementById("task-assignee").value = task.asignadoA;
+  document.getElementById("task-due-date").value = task.fechaDeEntrega;
+  document.getElementById("task-status").value = task.estado;
+
+  editingTaskId = task.id;
+  submitButton.textContent = "Actualizar";
 });
