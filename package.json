@@ -1,0 +1,28 @@
+{
+  "name": "planificador_de_tareas",
+  "version": "1.0.0",
+  "description": "Planificador de tareas con HTML, Bootstrap 5.3 y JavaScript.",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Biaya10/Planificador_de_Tareas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Biaya10/Planificador_de_Tareas/issues"
+  },
+  "homepage": "https://github.com/Biaya10/Planificador_de_Tareas#readme",
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2"
+  }
+}
