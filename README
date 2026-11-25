@@ -8,7 +8,8 @@ Aplicación web hecha con HTML, Bootstrap 5.3 y JavaScript. Permite agregar tare
 Planificador_de_Tareas/
 ├── index.html           # Formulario y contenedor de tareas
 ├── css/style.css        # Estilos propios
-├── js/app.js            # Clases Task y TaskManager, validación y eventos
+├── img/rama.svg         # Ramita con hojas usada como decoración de fondo
+├── js/app.js           # Clases Task y TaskManager, validación y eventos
 ├── tests/               # Pruebas unitarias (Jest + jsdom)
 │   ├── helpers.js           # Carga la app en un navegador simulado
 │   ├── taskManager.test.js  # Pruebas de la clase TaskManager
@@ -131,6 +132,17 @@ Implementé las decisiones anteriores en `js/app.js` y `index.html`. Probé el f
 
 ### 10. ¿Cómo probar el código?
 Se usa **Jest** para ejecutar las pruebas y **jsdom** para simular el navegador. Al final de `js/app.js` se exportan `Task` y `TaskManager` con un `if (typeof module !== "undefined")`, para que las pruebas puedan importarlos sin afectar al navegador. Cada prueba carga el `index.html` real y vacía `localStorage`, para empezar sin estado previo.
+
+### 11. ¿Qué estilo visual usar?
+Se reorganizó el diseño para que se vea más limpio, parecido a los paneles de gestión de proyectos, conservando la paleta pastel del Sprint 2 (crema, rosa y lila):
+- **Paleta pastel** definida como variables CSS al inicio de `style.css`. Los estados usan lila (POR HACER), rosa (EN PROCESO), amarillo (REVISIÓN) y verde (HECHO).
+- **Tipografía Inter** e íconos de línea (Bootstrap Icons) en lugar de emojis.
+- **Ramitas con hojas** en dos esquinas del fondo (`img/rama.svg`, usadas desde CSS con `body::before` y `body::after`). Van detrás del contenido y no bloquean los clics.
+- **Dos columnas** en pantallas grandes: formulario fijo a la izquierda y lista a la derecha. En celulares se apilan.
+- **Resumen** con el número de tareas por estado y mensaje cuando no hay tareas. Lo actualiza `updateSummary()` en `TaskManager`.
+- **Tarjetas** con franja de color según el estado, iniciales de la persona asignada y botones agrupados abajo.
+
+Los estilos están en `css/style.css`, organizados por secciones y con las variables de color al inicio.
 
 ## Posibles mejoras
 - `assignTask` existe y está probada, pero todavía no tiene interfaz para usarla desde la tarjeta.

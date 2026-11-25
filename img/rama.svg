@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <defs>
+    <!-- Una hoja: forma de gota con su nervadura. El color se pasa con "color" -->
+    <g id="hoja">
+      <path d="M0 0 C12 -20 42 -20 56 0 C42 20 12 20 0 0 Z" fill="currentColor"/>
+      <path d="M4 0 H48" stroke="#ffffff" stroke-opacity="0.65" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- Tallo -->
+  <path d="M290 10 C220 60 140 140 50 260" stroke="#8fd3ae" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Hojas verdes a ambos lados del tallo -->
+  <use href="#hoja" transform="translate(247 44) rotate(89) scale(1.0)" color="#b6e3c8"/>
+  <use href="#hoja" transform="translate(247 44) rotate(199) scale(0.9)" color="#8fd3ae"/>
+
+  <use href="#hoja" transform="translate(201 85) rotate(89) scale(1.05)" color="#8fd3ae"/>
+  <use href="#hoja" transform="translate(201 85) rotate(199) scale(0.95)" color="#cfeedd"/>
+
+  <use href="#hoja" transform="translate(153 135) rotate(89) scale(0.95)" color="#cfeedd"/>
+  <use href="#hoja" transform="translate(153 135) rotate(199) scale(1.0)" color="#b6e3c8"/>
+
+  <use href="#hoja" transform="translate(103 193) rotate(89) scale(0.8)" color="#b6e3c8"/>
+  <use href="#hoja" transform="translate(103 193) rotate(199) scale(0.8)" color="#8fd3ae"/>
+
+  <!-- Hoja de la punta -->
+  <use href="#hoja" transform="translate(50 260) rotate(144) scale(0.75)" color="#8fd3ae"/>
+
+  <!-- Hojitas lila y florecitas rosa para dar color -->
+  <use href="#hoja" transform="translate(180 108) rotate(150) scale(0.5)" color="#d9ccf5"/>
+  <use href="#hoja" transform="translate(128 163) rotate(20) scale(0.5)" color="#d9ccf5"/>
+
+  <g>
+    <circle cx="222" cy="22" r="7" fill="#f7c6dc"/>
+    <circle cx="222" cy="22" r="2.6" fill="#ee9fc3"/>
+    <circle cx="168" cy="78" r="6" fill="#f7c6dc"/>
+    <circle cx="168" cy="78" r="2.2" fill="#ee9fc3"/>
+    <circle cx="118" cy="140" r="6.5" fill="#fde8f1" stroke="#f7c6dc" stroke-width="1.5"/>
+    <circle cx="118" cy="140" r="2.4" fill="#ee9fc3"/>
+    <circle cx="72" cy="214" r="5.5" fill="#f7c6dc"/>
+    <circle cx="72" cy="214" r="2" fill="#ee9fc3"/>
+  </g>
+</svg>
