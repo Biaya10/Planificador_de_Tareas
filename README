@@ -9,6 +9,8 @@ Planificador_de_Tareas/
 ├── index.html           # Formulario y contenedor de tareas
 ├── css/style.css        # Estilos propios
 ├── img/rama.svg         # Ramita con hojas usada como decoración de fondo
+├── wrangler.jsonc       # Configuración para publicar el sitio en Cloudflare
+├── .assetsignore        # Archivos que no se publican (pruebas, node_modules, etc.)
 ├── js/app.js           # Clases Task y TaskManager, validación y eventos
 ├── tests/               # Pruebas unitarias (Jest + jsdom)
 │   ├── helpers.js           # Carga la app en un navegador simulado
