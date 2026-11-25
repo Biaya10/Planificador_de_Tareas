@@ -1,0 +1,12 @@
+{
+  // Nombre del Worker en Cloudflare (debe coincidir con el que ya existe)
+  "name": "planificador-de-tareas",
+  "compatibility_date": "2026-11-01",
+
+  // Se publica la raíz del proyecto (index.html, css, js e img).
+  // Lo que no es parte del sitio se excluye en el archivo .assetsignore
+  "assets": { "directory": "./" },
+
+  // Cloudflare exige este bloque para el comando "wrangler preview" (ramas que no son main)
+  "previews": {}
+}

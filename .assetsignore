@@ -1,0 +1,12 @@
+# Archivos que NO se publican en el sitio de Cloudflare
+node_modules
+tests
+package.json
+package-lock.json
+wrangler.jsonc
+README
+.gitignore
+.vscode
+.wrangler
+.assetsignore
+.git
