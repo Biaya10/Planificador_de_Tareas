@@ -2,6 +2,8 @@
 
 Aplicación web hecha con HTML, Bootstrap 5.3 y JavaScript. Permite agregar tareas mediante un formulario validado, verlas como tarjetas, marcarlas como HECHO, editarlas y eliminarlas. Las tareas se guardan en el navegador con `localStorage`, así que siguen ahí al recargar la página. El código tiene pruebas unitarias con Jest.
 
+**Sitio publicado:** https://planificador-de-tareas.amandachindoy7.workers.dev/ (se publica solo en Cloudflare cada vez que se fusiona un cambio en `main`).
+
 ## Estructura
 
 ```
