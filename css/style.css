@@ -1,5 +1,12 @@
-/* Paleta pastel */
+/* ==========================================================
+   Planificador de Tareas - estilos
+   Diseño limpio tipo panel de gestión de proyectos:
+   fondo neutro, un solo color de acento y colores de estado suaves.
+   ========================================================== */
+
+/* ---------- Variables (paleta y medidas) ---------- */
 :root {
+    /* Paleta pastel original */
     --crema: #fbf5ee;
     --rosa: #f7c6dc;
     --rosa-fuerte: #ee9fc3;
@@ -8,164 +15,464 @@
     --lila: #d9ccf5;
     --lila-claro: #efe9fc;
     --tinta: #2f2a3c;
+
+    /* Colores de la interfaz (construidos con la paleta de arriba) */
+    --fondo: var(--crema);
+    --superficie: #ffffff;
+    --borde: var(--lila-claro);
+    --borde-fuerte: var(--lila);
+
+    --texto: var(--tinta);
+    --texto-suave: #5d566e;
+    --texto-tenue: #8d86a0;
+
+    /* Mensajes de error */
+    --peligro: #b0305f;
+    --peligro-suave: #ffe9ef;
+    --peligro-borde: #ffb3c9;
+
+    /* Colores de cada estado: fondo del pill, texto y punto/franja */
+    --por-hacer-bg: var(--lila);        --por-hacer-tx: var(--tinta);   --por-hacer-dot: #b39ddf;
+    --en-proceso-bg: var(--rosa);       --en-proceso-tx: var(--tinta);  --en-proceso-dot: var(--rosa-fuerte);
+    --revision-bg: #fbe9b7;             --revision-tx: var(--tinta);    --revision-dot: #f5d77a;
+    --hecho-bg: #cfeedd;                --hecho-tx: var(--tinta);       --hecho-dot: #8fd3ae;
+
+    --radio: 14px;
+    --sombra: 0 2px 8px rgba(217, 204, 245, 0.35);
+    --sombra-hover: 0 10px 22px rgba(247, 198, 220, 0.55);
 }
 
+/* ---------- Base ---------- */
 .app-body {
-    font-family: "Quicksand", sans-serif;
-    font-size: 1.05rem;
-    color: var(--tinta);
-    background: var(--crema);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.95rem;
+    color: var(--texto);
+    background: var(--fondo);
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Encabezado */
+/* ---------- Decoración de fondo: ramitas con hojas en las esquinas ---------- */
+.app-body::before,
+.app-body::after {
+    content: "";
+    position: fixed;
+    width: min(38vw, 380px);
+    aspect-ratio: 1;
+    background: url("../img/rama.svg") no-repeat center / contain;
+    opacity: 0.8;
+    pointer-events: none; /* no estorba los clics */
+    z-index: 0;
+}
+
+/* Arriba a la derecha (debajo de la barra superior) */
+.app-body::before {
+    top: 3.5rem;
+    right: -4rem;
+}
+
+/* Abajo a la izquierda (la misma rama girada) */
+.app-body::after {
+    bottom: 0;
+    left: 0;
+    transform: rotate(180deg);
+}
+
+/* El contenido va por encima de la decoración */
+.app-header,
+.app-body main,
+.app-footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Barra superior ---------- */
 .app-header {
-    color: var(--tinta);
+    background: linear-gradient(120deg, #f4a8cb 0%, #cdb4f0 100%);
+    box-shadow: 0 4px 14px rgba(194, 87, 138, 0.2);
 }
 
-.header-box {
-    display: block;
-    background: linear-gradient(120deg, #f4a8cb 0%, #cdb4f0 100%);
-    padding: 1.6rem 2.5rem;
-    border-radius: 1.5rem;
-    box-shadow: 0 6px 16px rgba(194, 87, 138, 0.25);
+.app-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--rosa-oscuro);
+    font-size: 1.3rem;
+    flex-shrink: 0;
 }
 
 .app-title {
-    font-family: "Fredoka", sans-serif;
-    font-weight: 600;
-    font-size: 2.5rem;
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .app-subtitle {
-    font-size: 1.05rem;
-    font-weight: 500;
-}
-
-/* Títulos de sección */
-.section-title {
-    font-weight: 700;
+    margin: 0;
+    font-size: 0.85rem;
     color: var(--tinta);
+    opacity: 0.8;
 }
 
-/* Formulario */
+/* ---------- Títulos de sección ---------- */
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.2rem;
+}
+
+.section-hint {
+    font-size: 0.85rem;
+    color: var(--texto-tenue);
+    margin-bottom: 1rem;
+}
+
+.list-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.list-header .section-hint {
+    margin-bottom: 0;
+}
+
+/* ---------- Resumen (tarjetas de números) ---------- */
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 0.9rem 1.1rem;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+}
+
+.stat-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+}
+
+.stat-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.stat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-por-hacer { background: var(--por-hacer-dot); }
+.dot-en-proceso { background: var(--en-proceso-dot); }
+.dot-revision { background: var(--revision-dot); }
+.dot-hecho { background: var(--hecho-dot); }
+
+/* ---------- Formulario ---------- */
 .form-card {
-    border: 2px solid var(--rosa-claro);
-    border-left: 10px solid var(--rosa);
-    border-radius: 1.5rem;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(217, 204, 245, 0.45);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+}
+
+/* En pantallas grandes el formulario se queda fijo al hacer scroll */
+@media (min-width: 992px) {
+    .form-card {
+        position: sticky;
+        top: 1.25rem;
+    }
+}
+
+.form-card .card-body {
+    padding: 1.4rem;
 }
 
 .form-label {
+    font-size: 0.85rem;
     font-weight: 600;
+    color: var(--texto);
+    margin-bottom: 0.35rem;
 }
 
 .form-control,
 .form-select {
-    border: 2px solid var(--lila-claro);
-    border-radius: 1rem;
     font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--texto);
+    background-color: var(--superficie);
+    border: 1px solid var(--borde-fuerte);
+    border-radius: 8px;
+    padding: 0.55rem 0.8rem;
+}
+
+.form-control::placeholder {
+    color: var(--texto-tenue);
 }
 
 .form-control:focus,
 .form-select:focus {
     border-color: var(--rosa-fuerte);
-    box-shadow: 0 0 0 0.25rem rgba(247, 198, 220, 0.5);
+    box-shadow: 0 0 0 3px rgba(247, 198, 220, 0.5);
 }
 
-.btn-cute {
+/* Botón principal */
+.btn-primary-app {
     background: var(--lila);
     color: var(--tinta);
     border: none;
-    border-radius: 2rem;
-    padding: 0.5rem 1.6rem;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
     font-weight: 700;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-cute:hover {
+.btn-primary-app:hover,
+.btn-primary-app:focus {
     background: var(--rosa);
     color: var(--tinta);
-    transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(194, 87, 138, 0.25);
 }
 
-/* Mensajes de error */
+/* Mensajes de error del formulario */
 .form-errors {
-    background: #ffe9ef;
-    border: 2px solid #ffb3c9;
-    border-radius: 1rem;
-    color: #b0305f;
+    background: var(--peligro-suave);
+    border: 1px solid var(--peligro-borde);
+    border-radius: 8px;
+    color: var(--peligro);
+    font-size: 0.85rem;
+    margin-bottom: 0;
 }
 
 .form-errors div + div {
     margin-top: 0.25rem;
 }
 
-/* Tarjetas de tarea: la franja superior cambia según el estado */
+/* ---------- Tarjetas de tarea ---------- */
 .task-card {
-    --acento: var(--lila);
-    border: 2px solid var(--lila-claro);
-    border-top: 8px solid var(--acento);
-    border-radius: 1.5rem;
-    background: #fff;
-    box-shadow: 0 6px 16px rgba(217, 204, 245, 0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    --acento-estado: var(--por-hacer-dot);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--acento-estado);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    cursor: pointer; /* al hacer clic se carga en el formulario para editarla */
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .task-card:hover {
-    transform: translateY(-5px) rotate(-0.5deg);
-    box-shadow: 0 12px 24px rgba(247, 198, 220, 0.6);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+    border-color: var(--borde-fuerte);
+    border-left-color: var(--acento-estado);
+}
+
+.task-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.1rem 1.2rem;
 }
 
 .task-card .card-title {
-    color: var(--tinta);
-    font-weight: 700;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--texto);
+}
+
+.task-card .card-text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--texto-suave);
+}
+
+/* Color de la franja izquierda según el estado */
+.task-card[data-status="POR HACER"] { --acento-estado: var(--por-hacer-dot); }
+.task-card[data-status="EN PROCESO"] { --acento-estado: var(--en-proceso-dot); }
+.task-card[data-status="REVISIÓN"] { --acento-estado: var(--revision-dot); }
+.task-card[data-status="HECHO"] { --acento-estado: var(--hecho-dot); }
+
+/* Etiqueta de estado (pill con punto) */
+.task-top {
+    display: flex;
+    align-items: center;
 }
 
 .task-badge {
-    font-size: 0.8rem;
-    border-radius: 2rem;
-    padding: 0.4em 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
-.status-por-hacer { background: var(--lila); color: var(--tinta); }
-.status-en-proceso { background: var(--rosa); color: var(--tinta); }
-.status-revision { background: #fbe9b7; color: var(--tinta); }
-.status-hecho { background: #cfeedd; color: var(--tinta); }
+.task-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.status-por-hacer { background: var(--por-hacer-bg); color: var(--por-hacer-tx); }
+.status-en-proceso { background: var(--en-proceso-bg); color: var(--en-proceso-tx); }
+.status-revision { background: var(--revision-bg); color: var(--revision-tx); }
+.status-hecho { background: var(--hecho-bg); color: var(--hecho-tx); }
+
+/* Responsable y fecha de entrega */
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    font-size: 0.82rem;
+    color: var(--texto-suave);
+}
+
+.task-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+/* Círculo con las iniciales de la persona asignada */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 50%;
+    background: var(--rosa-claro);
+    color: var(--rosa-oscuro);
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* Botones de la tarjeta */
+.task-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+    margin-top: 0.1rem;
+    border-top: 1px solid var(--borde);
+}
+
+.task-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+}
+
+.btn-complete {
+    background: var(--hecho-bg);
+    color: #1f6b45;
+    border: 1px solid var(--hecho-dot);
+}
+
+.btn-complete:hover {
+    background: var(--hecho-dot);
+    color: var(--tinta);
+    border-color: var(--hecho-dot);
+}
 
 .btn-delete {
     background: var(--rosa-claro);
     color: var(--rosa-oscuro);
-    border: 2px solid var(--rosa-fuerte);
-    border-radius: 2rem;
-    font-weight: 600;
+    border: 1px solid var(--rosa-fuerte);
+    margin-left: auto;
 }
 
 .btn-delete:hover {
     background: var(--rosa-fuerte);
     color: var(--tinta);
+    border-color: var(--rosa-fuerte);
 }
 
-/* Color de la franja según el estado */
-.task-card[data-status="POR HACER"] { --acento: var(--lila); }
-.task-card[data-status="EN PROCESO"] { --acento: var(--rosa-fuerte); }
-.task-card[data-status="REVISIÓN"] { --acento: #f5d77a; }
-.task-card[data-status="HECHO"] { --acento: #8fd3ae; }
+/* ---------- Mensaje cuando no hay tareas ---------- */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--texto-tenue);
+    background: var(--superficie);
+    border: 1px dashed var(--borde-fuerte);
+    border-radius: var(--radio);
+}
 
-/* Pie de página */
+.empty-state i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ---------- Pie de página ---------- */
 .app-footer {
-    color: var(--tinta);
-    font-weight: 500;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--texto-tenue);
 }
 
-/* Celulares: título más pequeño para que no se desborde */
-@media (max-width: 576px) {
-    .header-box {
-        padding: 0.8rem 1.2rem;
+/* ---------- Accesibilidad: sin animaciones si el usuario lo prefiere ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .task-card,
+    .btn-primary-app {
+        transition: none;
     }
 
+    .task-card:hover {
+        transform: none;
+    }
+}
+
+/* ---------- Celulares ---------- */
+@media (max-width: 576px) {
     .app-title {
-        font-size: 1.6rem;
+        font-size: 1.05rem;
+    }
+
+    .app-subtitle {
+        display: none;
+    }
+
+    .form-card .card-body {
+        padding: 1.1rem;
     }
 }

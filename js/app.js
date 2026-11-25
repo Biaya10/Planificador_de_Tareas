@@ -6,10 +6,28 @@ const STATUS_COLORS = {
   HECHO: "status-hecho",
 };
 
+// Id del contador de cada estado en el resumen de arriba (están en index.html)
+const SUMMARY_IDS = {
+  "POR HACER": "count-por-hacer",
+  "EN PROCESO": "count-en-proceso",
+  REVISIÓN: "count-revision",
+  HECHO: "count-hecho",
+};
+
 // Convierte "2026-11-02" en "02/11/2026" solo para mostrarlo
 function formatDate(isoDate) {
   const [year, month, day] = isoDate.split("-");
   return `${day}/${month}/${year}`;
+}
+
+// Devuelve las iniciales de un nombre: "Amanda Chindoy" -> "AC"
+function getInitials(name) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join("");
 }
 
 // Task: representa una tarea con sus datos (el id lo asigna TaskManager)
@@ -89,11 +107,10 @@ class TaskManager {
     return this.tasks.find((task) => task.id === taskId);
   }
 
-  //Crear la tarjeta: recibe una tarea y devuel el elemento HTML
-
+  // Crea la tarjeta de una tarea: recibe la tarea y devuelve el elemento HTML
   createTaskCard(task) {
     const col = document.createElement("div");
-    col.className = "col-md-4";
+    col.className = "col-md-6";
     col.id = `task-${task.id}`;
     col.dataset.taskId = task.id; // guarda el id en el HTML (data-task-id) para saber de qué tarea es la tarjeta
 
@@ -104,52 +121,80 @@ class TaskManager {
     const body = document.createElement("div");
     body.className = "card-body";
 
+    // Etiqueta del estado (pill de color)
+    const status = document.createElement("span");
+    status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
+    status.textContent = task.estado;
+
+    const top = document.createElement("div");
+    top.className = "task-top";
+    top.append(status);
+
     const title = document.createElement("h3");
-    title.className = "card-title h5";
+    title.className = "card-title";
     title.textContent = task.nombre;
 
     const description = document.createElement("p");
     description.className = "card-text";
     description.textContent = task.descripcion;
 
-    const assignee = document.createElement("p");
-    assignee.className = "mb-1";
-    assignee.textContent = `👤 Asignado a: ${task.asignadoA}`;
+    // Persona asignada: círculo con iniciales + nombre
+    const avatar = document.createElement("span");
+    avatar.className = "avatar";
+    avatar.textContent = getInitials(task.asignadoA);
 
-    const dueDate = document.createElement("p");
-    dueDate.className = "mb-1";
-    dueDate.textContent = `📅 Entrega: ${formatDate(task.fechaDeEntrega)}`;
+    const assigneeName = document.createElement("span");
+    assigneeName.textContent = task.asignadoA;
 
-    const status = document.createElement("span");
-    status.className = `task-badge badge ${STATUS_COLORS[task.estado] || "status-por-hacer"}`;
-    status.textContent = task.estado;
+    const assignee = document.createElement("span");
+    assignee.className = "task-meta-item";
+    assignee.append(avatar, assigneeName);
+
+    // Fecha de entrega: ícono de calendario + fecha
+    const calendarIcon = document.createElement("i");
+    calendarIcon.className = "bi bi-calendar-event";
+
+    const dueDate = document.createElement("span");
+    dueDate.className = "task-meta-item";
+    dueDate.append(calendarIcon, formatDate(task.fechaDeEntrega));
+
+    const meta = document.createElement("div");
+    meta.className = "task-meta";
+    meta.append(assignee, dueDate);
 
     // Botón "Completar": la clase done-button sirve para detectarlo al hacer clic
     const doneButton = document.createElement("button");
     doneButton.type = "button";
-    doneButton.className = "btn btn-success btn-sm mt-3 d-block done-button";
-    doneButton.textContent = "Completar";
+    doneButton.className = "btn btn-complete done-button";
+    const doneIcon = document.createElement("i");
+    doneIcon.className = "bi bi-check2";
+    doneButton.append(doneIcon, "Completar");
 
     // Botón "Eliminar"
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
-    deleteButton.className = "btn btn-delete btn-sm mt-3 d-block";
-    deleteButton.textContent = "Eliminar";
+    deleteButton.className = "btn btn-delete";
+    const deleteIcon = document.createElement("i");
+    deleteIcon.className = "bi bi-trash3";
+    deleteButton.append(deleteIcon, "Eliminar");
 
     // Al hacer clic en "Eliminar"
     deleteButton.addEventListener("click", () => {
       this.deleteTask(task.id); // 1. la quita del array
       col.remove(); // 2. quita la tarjeta del DOM
       this.save(); // 3. guarda el cambio en localStorage
+      this.updateSummary(); // 4. actualiza los contadores del resumen
     });
 
-    body.append(title, description, assignee, dueDate, status);
-    // "Completar" solo aparece si la tarea todavía no está en HECHO
+    // Zona de botones: "Completar" solo aparece si la tarea todavía no está en HECHO
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
     if (task.estado !== "HECHO") {
-      body.append(doneButton);
+      actions.append(doneButton);
     }
-    body.append(deleteButton);
+    actions.append(deleteButton);
 
+    body.append(top, title, description, meta, actions);
     card.append(body);
     col.append(card);
     return col; // devuelve la tarjeta creada
@@ -162,6 +207,27 @@ class TaskManager {
     this.tasks.forEach((task) => {
       container.append(this.createTaskCard(task));
     });
+    this.updateSummary();
+  }
+
+  // Actualiza los contadores del resumen y muestra el mensaje de "sin tareas" si la lista está vacía
+  updateSummary() {
+    const total = document.getElementById("count-total");
+    if (total) {
+      total.textContent = this.tasks.length;
+    }
+
+    Object.entries(SUMMARY_IDS).forEach(([status, id]) => {
+      const counter = document.getElementById(id);
+      if (counter) {
+        counter.textContent = this.getTasksWithStatus(status).length;
+      }
+    });
+
+    const emptyState = document.getElementById("empty-state");
+    if (emptyState) {
+      emptyState.classList.toggle("d-none", this.tasks.length > 0);
+    }
   }
 
   // Guarda las tareas y el contador de ids en localStorage.
@@ -360,9 +426,11 @@ taskForm.addEventListener("submit", (event) => {
 const taskList = document.querySelector("#task-container");
 
 taskList.addEventListener("click", (event) => {
-  // 1. Botón "Completar": cambia el estado de la tarea a HECHO
-  if (event.target.classList.contains("done-button")) {
-    const taskElement = event.target.closest("[data-task-id]");
+  // 1. Botón "Completar": cambia el estado de la tarea a HECHO.
+  // Se usa closest() porque el clic puede caer en el ícono que está dentro del botón
+  const doneButton = event.target.closest(".done-button");
+  if (doneButton) {
+    const taskElement = doneButton.closest("[data-task-id]");
     const taskId = Number(taskElement.dataset.taskId); // el dataset es texto, se pasa a número
     taskManager.updateTask(taskId, "HECHO");
     taskManager.render();
